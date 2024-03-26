@@ -4,7 +4,7 @@
 """
 Chosen Model: Gradient Boosting Machine (GBM)
 Alternatives: Time Series Analysis (ARIMA, SARIMA)
-Output: 
+Output: IDK
 
 """
 
@@ -12,7 +12,7 @@ Output:
 """
 Chosen Model: Gradient Boosting Machine (GBM) + Neural Networks
 Alternatives: Time Series Analysis (ARIMA, SARIMA)
-Output: 
+Output: Lead Time vs Order Quantity Scatter Plot
 
 """
 
@@ -20,7 +20,7 @@ Output:
 """
 Chosen Model: Economic Order Quantity (EOQ) + Neural Networks 
 Alternatives: Stochastic Inventory Models
-Output:
+Output: ABC Analysis Pie Chart? Inventory Level Heat Map?
 
 """
 
