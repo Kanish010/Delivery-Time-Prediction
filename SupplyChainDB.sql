@@ -5,7 +5,7 @@ CREATE DATABASE SupplyChainDB;
 USE SupplyChainDB;
 
 -- Create the Products table
-CREATE TABLE Products (
+CREATE TABLE SupplyChainData (
     ID INT AUTO_INCREMENT PRIMARY KEY,
     ProductID INT,
     Date DATE,
