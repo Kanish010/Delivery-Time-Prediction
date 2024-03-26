@@ -12,7 +12,7 @@ Output: IDK
 """
 Chosen Model: Gradient Boosting Machine (GBM) + Neural Networks
 Alternatives: Time Series Analysis (ARIMA, SARIMA)
-Output: Lead Time vs Order Quantity Scatter Plot
+Output: Lead Time vs Order Quantity Scatter Plot?
 
 """
 
