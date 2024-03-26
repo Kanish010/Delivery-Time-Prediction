@@ -6,7 +6,8 @@ USE SupplyChainDB;
 
 -- Create the Products table
 CREATE TABLE Products (
-    ProductID INT PRIMARY KEY,
+    ID INT AUTO_INCREMENT PRIMARY KEY,
+    ProductID INT,
     Date DATE,
     SalesVolume INT,
     Price DECIMAL(8, 2),
