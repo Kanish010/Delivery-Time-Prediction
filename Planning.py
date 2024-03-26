@@ -4,6 +4,7 @@
 """
 Chosen Model: Gradient Boosting Machine (GBM)
 Alternatives: Time Series Analysis (ARIMA, SARIMA)
+Output: 
 
 """
 
@@ -11,6 +12,7 @@ Alternatives: Time Series Analysis (ARIMA, SARIMA)
 """
 Chosen Model: Gradient Boosting Machine (GBM) + Neural Networks
 Alternatives: Time Series Analysis (ARIMA, SARIMA)
+Output: 
 
 """
 
@@ -18,6 +20,7 @@ Alternatives: Time Series Analysis (ARIMA, SARIMA)
 """
 Chosen Model: Economic Order Quantity (EOQ) + Neural Networks 
 Alternatives: Stochastic Inventory Models
+Output:
 
 """
 
@@ -25,6 +28,7 @@ Alternatives: Stochastic Inventory Models
 """
 Chosen Model: Bayesian State-Space Models
 Alternatives: Dynamic Bayesians Networks, Stochastic Bayesian Networks
+Output: Show heatmaps of problem areas on the world map
 
 """
 
