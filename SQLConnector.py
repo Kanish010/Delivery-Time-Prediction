@@ -7,8 +7,8 @@ user = 'your_username'
 password = 'password'
 database = 'SupplyChainDB'
 
-# Path to your CSV file on desktop
-csv_file_path = '/Users/your_filepath/Desktop/SupplyChain_data.csv'
+# Path to your CSV file
+csv_file_path = 'your/file/path'
 
 try:
     # Connect to the MySQL database
@@ -25,13 +25,14 @@ try:
         # Read the CSV file into a DataFrame
         df = pd.read_csv(csv_file_path)
 
-        # Remove ProductID from DataFrame
-        df = df.drop(columns=['ProductID'])
-
         # Insert DataFrame records into MySQL database
         for i, row in df.iterrows():
-            sql = "INSERT INTO SupplyChainData (Date, SalesVolume, Price, Promotion, Category, Brand, SeasonalityFactor, CompetitorPresence, WeatherCondition, InventoryLevel, LeadTime_days, DemandForecast_units, EOQ_units, UnitCost, SupplierID, OrderDate, DeliveryDate, OrderQuantity_units, TransportationMode, SupplierLocation, OrderUrgency, OrderType, GeopoliticalRisk, NaturalDisasterRisk, MarketVolatilityRisk, SupplierReliability) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            cursor.execute(sql, tuple(row))
+            # Construct the SQL INSERT query
+            sql = "INSERT INTO SupplyChainData (ProductID, Date, SalesVolume, Price, Promotion, Category, Brand, SeasonalityFactor, CompetitorPresence, WeatherCondition, InventoryLevel, LeadTime_days, DemandForecast_units, EOQ_units, UnitCost, SupplierID, OrderDate, DeliveryDate, OrderQuantity_units, TransportationMode, SupplierLocation, OrderUrgency, OrderType, GeopoliticalRisk, NaturalDisasterRisk, MarketVolatilityRisk, SupplierReliability) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            # Extract the values from the row
+            values = (row['ProductID'], row['Date'], row['SalesVolume'], row['Price'], row['Promotion'], row['Category'], row['Brand'], row['SeasonalityFactor'], row['CompetitorPresence'], row['WeatherCondition'], row['InventoryLevel'], row['LeadTime_days'], row['DemandForecast_units'], row['EOQ_units'], row['UnitCost'], row['SupplierID'], row['OrderDate'], row['DeliveryDate'], row['OrderQuantity_units'], row['TransportationMode'], row['SupplierLocation'], row['OrderUrgency'], row['OrderType'], row['GeopoliticalRisk'], row['NaturalDisasterRisk'], row['MarketVolatilityRisk'], row['SupplierReliability'])
+            # Execute the SQL query
+            cursor.execute(sql, values)
 
         # Commit changes and close connection
         connection.commit()
