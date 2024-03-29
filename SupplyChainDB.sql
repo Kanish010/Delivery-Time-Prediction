@@ -1,13 +1,13 @@
 -- Create the database
-CREATE DATABASE SupplyChainDB;
+CREATE DATABASE IF NOT EXISTS SupplyChainDB;
 
 -- Switch to the newly created database
 USE SupplyChainDB;
 
 -- Create the Products table
-CREATE TABLE SupplyChainData (
-    UniqueID INT AUTO_INCREMENT PRIMARY KEY,
-    ProductID INT,
+CREATE TABLE IF NOT EXISTS SupplyChainData (
+    EntryID INT AUTO_INCREMENT PRIMARY KEY,
+    ProductID VARCHAR(36),
     Date DATE,
     SalesVolume INT,
     Price DECIMAL(8, 2),
