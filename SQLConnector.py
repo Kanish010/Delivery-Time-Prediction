@@ -2,13 +2,13 @@ import pandas as pd
 import mysql.connector
 
 # MySQL database connection details
-host = 'localhost'
+host = 'your_host'
 user = 'your_username'
-password = 'your_password'
+password = 'password'
 database = 'SupplyChainDB'
 
 # Path to your CSV file on desktop
-csv_file_path = '/path/to/your/desktop/SupplyChain_data.csv'
+csv_file_path = '/Users/your_filepath/Desktop/SupplyChain_data.csv'
 
 try:
     # Connect to the MySQL database
@@ -30,7 +30,7 @@ try:
 
         # Insert DataFrame records into MySQL database
         for i, row in df.iterrows():
-            sql = "INSERT INTO Products (Date, SalesVolume, Price, Promotion, Category, Brand, SeasonalityFactor, CompetitorPresence, WeatherCondition, InventoryLevel, LeadTime_days, DemandForecast_units, EOQ_units, UnitCost, SupplierID, OrderDate, DeliveryDate, OrderQuantity_units, TransportationMode, SupplierLocation, OrderUrgency, OrderType, GeopoliticalRisk, NaturalDisasterRisk, MarketVolatilityRisk, SupplierReliability) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+            sql = "INSERT INTO SupplyChainData (Date, SalesVolume, Price, Promotion, Category, Brand, SeasonalityFactor, CompetitorPresence, WeatherCondition, InventoryLevel, LeadTime_days, DemandForecast_units, EOQ_units, UnitCost, SupplierID, OrderDate, DeliveryDate, OrderQuantity_units, TransportationMode, SupplierLocation, OrderUrgency, OrderType, GeopoliticalRisk, NaturalDisasterRisk, MarketVolatilityRisk, SupplierReliability) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
             cursor.execute(sql, tuple(row))
 
         # Commit changes and close connection
