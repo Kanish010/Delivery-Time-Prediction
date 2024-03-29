@@ -6,7 +6,7 @@ USE SupplyChainDB;
 
 -- Create the Products table
 CREATE TABLE SupplyChainData (
-    ID INT AUTO_INCREMENT PRIMARY KEY,
+    UniqueID INT AUTO_INCREMENT PRIMARY KEY,
     ProductID INT,
     Date DATE,
     SalesVolume INT,
@@ -27,11 +27,11 @@ CREATE TABLE SupplyChainData (
     DeliveryDate DATE,
     OrderQuantity_units INT,
     TransportationMode VARCHAR(20),
-    SupplierLocation VARCHAR(50),
+    SupplierLocation VARCHAR(250),
     OrderUrgency INT,
     OrderType VARCHAR(20),
-    GeopoliticalRisk VARCHAR(10),
-    NaturalDisasterRisk VARCHAR(10),
-    MarketVolatilityRisk VARCHAR(10),
-    SupplierReliability VARCHAR(10)
+    GeopoliticalRisk VARCHAR(250),
+    NaturalDisasterRisk VARCHAR(250),
+    MarketVolatilityRisk VARCHAR(250),
+    SupplierReliability VARCHAR(100)
 );
