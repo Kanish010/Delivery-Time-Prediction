@@ -2,6 +2,7 @@ import pandas as pd
 from faker import Faker
 import random
 import os
+import uuid
 
 # Initialize Faker for generating fake data
 fake = Faker()
@@ -19,7 +20,7 @@ brand_categories = {
 
 # Generate synthetic data for each column
 data = {
-    'ProductID': [random.randint(1001, 500001) for _ in range(num_rows)],
+    'ProductID': [str(uuid.uuid4()) for _ in range(num_rows)],  # Generate unique ProductIDs using UUID
     'Date': [fake.date_between(start_date='-5y', end_date='today') for _ in range(num_rows)],
     'SalesVolume': [random.randint(100, 500) for _ in range(num_rows)],
     'Price': [round(random.uniform(5.99, 99.99), 2) for _ in range(num_rows)],
