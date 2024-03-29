@@ -26,7 +26,7 @@ Output: ABC Analysis Pie Chart? Inventory Level Heat Map?
 
 # Supply Chain Risk Management 
 """
-Chosen Model: Bayesian State-Space Models
+Chosen Model: Neural Networks 
 Alternatives: Dynamic Bayesians Networks, Stochastic Bayesian Networks
 Output: Show heatmaps of problem areas on the world map
 
