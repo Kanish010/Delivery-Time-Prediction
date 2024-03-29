@@ -19,10 +19,10 @@ brand_categories = {
 
 # Generate synthetic data for each column
 data = {
-    'ProductID': [random.randint(1001, 1050) for _ in range(num_rows)],
+    'ProductID': [random.randint(1001, 500001) for _ in range(num_rows)],
     'Date': [fake.date_between(start_date='-5y', end_date='today') for _ in range(num_rows)],
     'SalesVolume': [random.randint(100, 500) for _ in range(num_rows)],
-    'Price': [round(random.uniform(5.99, 20.99), 2) for _ in range(num_rows)],
+    'Price': [round(random.uniform(5.99, 99.99), 2) for _ in range(num_rows)],
     'Promotion': [random.choice([0, 1]) for _ in range(num_rows)],
     'Category': [],
     'Brand': [],
