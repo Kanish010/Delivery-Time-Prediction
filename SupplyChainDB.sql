@@ -38,7 +38,7 @@ CREATE TABLE LeadTimePrediction (
     OrderUrgency INT,
     OrderType VARCHAR(10),
     PRIMARY KEY (ProductID),
-    FOREIGN KEY (ProductID) REFERENCES DemandForecasting(ProductID)
+    FOREIGN KEY (ProductID) REFERENCES DemandForecasting(ProductID),
     PRIMARY KEY (SupplierID),
     FOREIGN KEY (SupplierID) REFERENCES Supplier(SupplierID)
 );
