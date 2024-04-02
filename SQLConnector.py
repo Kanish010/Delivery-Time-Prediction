@@ -1,14 +1,16 @@
 import pandas as pd
 import mysql.connector
+import os
 
 # MySQL database connection details
-host = 'your_host'
-user = 'your_username'
+host = 'localhost'
+user = 'root'
 password = 'password'
 database = 'SupplyChainDB'
 
-# Path to your CSV file
-csv_file_path = 'your/file/path'
+# File paths for CSV files
+demand_forecasting_csv = '/path/to/DemandForecasting_data.csv'
+inventory_optimization_csv = '/path/to/InventoryOptimization_data.csv'
 
 try:
     # Connect to the MySQL database
@@ -22,25 +24,23 @@ try:
     if connection.is_connected():
         cursor = connection.cursor()
 
-        # Read the CSV file into a DataFrame
-        df = pd.read_csv(csv_file_path)
+        # Iterate through CSV files
+        for csv_file, table_name in [(demand_forecasting_csv, 'DemandForecasting'), (inventory_optimization_csv, 'InventoryOptimization')]:
+            # Read the CSV file into a DataFrame
+            df = pd.read_csv(csv_file)
 
-        # Insert DataFrame records into MySQL database
-        for i, row in df.iterrows():
-            # Construct the SQL INSERT query
-            sql = "INSERT INTO SupplyChainData (ProductID, Date, SalesVolume, Price, Promotion, Category, Brand, SeasonalityFactor, CompetitorPresence, WeatherCondition, InventoryLevel, LeadTime_days, DemandForecast_units, EOQ_units, UnitCost, SupplierID, OrderDate, DeliveryDate, OrderQuantity_units, TransportationMode, SupplierLocation, OrderUrgency, OrderType, GeopoliticalRisk, NaturalDisasterRisk, MarketVolatilityRisk, SupplierReliability) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-            # Extract the values from the row
-            values = (row['ProductID'], row['Date'], row['SalesVolume'], row['Price'], row['Promotion'], 
-                      row['Category'], row['Brand'], row['SeasonalityFactor'], row['CompetitorPresence'], 
-                      row['WeatherCondition'], row['InventoryLevel'], row['LeadTime_days'], row['DemandForecast_units'], 
-                      row['EOQ_units'], row['UnitCost'], row['SupplierID'], row['OrderDate'], row['DeliveryDate'], row['OrderQuantity_units'], 
-                      row['TransportationMode'], row['SupplierLocation'], row['OrderUrgency'], row['OrderType'], row['GeopoliticalRisk'], 
-                      row['NaturalDisasterRisk'], row['MarketVolatilityRisk'], row['SupplierReliability'])
-            # Execute the SQL query
-            cursor.execute(sql, values)
+            # Insert DataFrame records into MySQL database
+            for i, row in df.iterrows():
+                # Construct the SQL INSERT query
+                sql = f"INSERT INTO {table_name} ({', '.join(df.columns)}) VALUES ({', '.join(['%s' for _ in range(len(df.columns))])})"
+                # Extract the values from the row
+                values = tuple(row)
+                # Execute the SQL query
+                cursor.execute(sql, values)
 
-        # Commit changes and close connection
-        connection.commit()
+            # Commit changes after processing each CSV file
+            connection.commit()
+
         cursor.close()
         print("Data uploaded successfully to MySQL database.")
 
