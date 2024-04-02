@@ -3,17 +3,40 @@ from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import train_test_split
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+import matplotlib.pyplot as plt
+import mysql.connector
 
 class DemandForecaster:
-    def __init__(self, data_path):
-        self.data = pd.read_csv(data_path)
+    def __init__(self, host, user, password, database, table):
+        self.data = self.fetch_data_from_mysql(host, user, password, database, table)
         self.preprocess_data()
         self.train, self.test = self.split_data()
 
+    def fetch_data_from_mysql(self, host, user, password, database, table):
+        try:
+            connection = mysql.connector.connect(
+                host=host,
+                user=user,
+                password=password,
+                database=database
+            )
+            if connection.is_connected():
+                cursor = connection.cursor()
+                cursor.execute(f"SELECT * FROM {table}")
+                data = cursor.fetchall()
+                columns = [desc[0] for desc in cursor.description]
+                df = pd.DataFrame(data, columns=columns)
+                cursor.close()
+                connection.close()
+                return df
+        except mysql.connector.Error as e:
+            print("Error while connecting to MySQL", e)
+            return None
+
     def preprocess_data(self):
         self.data = self.data.dropna()
-        self.data['date'] = pd.to_datetime(self.data['date'])
-        self.data.set_index('date', inplace=True)
+        # Add preprocessing steps if needed
+        pass
 
     def split_data(self, test_size=0.2, shuffle=False):
         return train_test_split(self.data, test_size=test_size, shuffle=shuffle)
@@ -45,9 +68,29 @@ class DemandForecaster:
         self.ensemble_forecast()
         return self.evaluate_performance()
 
+    def visualize_forecasts(self):
+        # Plot actual vs predicted demand
+        plt.figure(figsize=(10, 6))
+        plt.plot(self.test.index, self.test['demand'], label='Actual Demand', color='blue')
+        plt.plot(self.test.index, self.forecast_ensemble, label='Predicted Demand', color='red')
+        plt.title('Actual vs Predicted Demand')
+        plt.xlabel('Date')
+        plt.ylabel('Demand')
+        plt.legend()
+        plt.show()
+
 # Usage
-forecaster = DemandForecaster('demand_data.csv')
+host = 'your_host'
+user = 'your_username'
+password = 'password'
+database = 'SupplyChainDB'
+table = 'DemandForecasting_data'
+
+forecaster = DemandForecaster(host, user, password, database, table)
 mse, mae, r2 = forecaster.run_forecasting()
 print(f'Mean Squared Error: {mse}')
 print(f'Mean Absolute Error: {mae}')
 print(f'R-squared: {r2}')
+
+# Visualize forecasts
+forecaster.visualize_forecasts()
