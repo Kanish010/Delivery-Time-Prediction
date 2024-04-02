@@ -9,3 +9,15 @@ Before running the script, make sure to install the required libraries by execut
 pip install faker pandas mysql.connector
 
 # Classes
+### Demand Forecasting:
+
+
+### Inventory Optimization:
+
+
+### Lead Time Prediction:
+
+
+### Risk Management:
+
+
