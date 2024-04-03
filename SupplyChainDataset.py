@@ -5,7 +5,7 @@ import os
 import uuid
 
 class DataGenerator:
-    def __init__(self, num_rows=500000):
+    def __init__(self, num_rows=100000):
         self.num_rows = num_rows
         self.fake = Faker()
 
