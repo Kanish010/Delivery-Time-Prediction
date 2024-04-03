@@ -53,6 +53,7 @@ class DemandForecaster:
     def preprocess_data(self):
         self.data = self.data.dropna()
         self.data.drop(columns=['Date'], inplace=True)
+        self.data = pd.get_dummies(self.data, columns=['ProductID', 'Promotion', 'Category', 'Brand', 'WeatherCondition'])
         self.data.reset_index(drop=True, inplace=True)
 
     def split_data(self, test_size=0.2, shuffle=False):
