@@ -2,7 +2,7 @@
 
 # Demand Forecasting
 """
-Chosen Model: Gradient Boosting Machine (GBM)
+Chosen Model: Neural Networks + XGBoost
 Alternatives: Time Series Analysis (ARIMA, SARIMA)
 Output: IDK
 
