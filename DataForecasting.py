@@ -28,7 +28,7 @@ class DemandForecaster:
             if connection.is_connected():
                 cursor = connection.cursor()
 
-                for offset in range(0, 5000, self.batch_size):  # Update batch size for 100k rows
+                for offset in range(0, 5000, self.batch_size):  
                     sql = f"SELECT * FROM {self.table_name} LIMIT {self.batch_size} OFFSET {offset}"
                     cursor.execute(sql)
                     data = cursor.fetchall()
