@@ -77,15 +77,11 @@ class DemandForecaster:
 
     def build_lstm_model(self, input_shape):
         model = tf.keras.Sequential([
-            tf.keras.layers.Dense(500, activation="relu"),
-            tf.keras.layers.Dropout(0.5),
-            tf.keras.layers.Dense(400, activation="relu"),
-            tf.keras.layers.Dropout(0.4),
-            tf.keras.layers.Dense(300, activation="relu"),
+            tf.keras.layers.Dense(256, activation="relu"),
             tf.keras.layers.Dropout(0.3),
-            tf.keras.layers.Dense(200, activation="relu"),
+            tf.keras.layers.Dense(128, activation="relu"),
             tf.keras.layers.Dropout(0.2),
-            tf.keras.layers.Dense(100, activation="relu"),
+            tf.keras.layers.Dense(64, activation="relu"),
             tf.keras.layers.Dropout(0.1),
             tf.keras.layers.Dense(1)
         ])
@@ -134,7 +130,7 @@ class DemandForecaster:
         X_train, X_test, y_train, y_test = self.split_data()
         
         # Train LSTM model
-        lstm_model, history = self.train_lstm_model(X_train, y_train)
+        lstm_model, _ = self.train_lstm_model(X_train, y_train)
         
         # Train Random Forest model
         rf_model = self.build_random_forest_model()
