@@ -157,7 +157,7 @@ class DemandForecaster:
         return mse, mae, r2
 
 if __name__ == "__main__":
-    forecaster = DemandForecaster('localhost', 'root', '5g6JVu32Dj', 'SupplyChainDB', 'DemandForecasting')
+    forecaster = DemandForecaster('localhost', 'root', 'password', 'SupplyChainDB', 'DemandForecasting')
     mse, mae, r2 = forecaster.run_forecasting()
     print(f'Mean Squared Error: {mse}')
     print(f'Mean Absolute Error: {mae}')
