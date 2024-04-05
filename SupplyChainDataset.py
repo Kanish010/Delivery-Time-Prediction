@@ -25,8 +25,8 @@ class DataGenerator:
             'Promotion': [random.choice([0, 1]) for _ in range(self.num_rows)],
             'Category': [],
             'Brand': [],
-            'SeasonalityFactor': [random.choice([0, 1]) for _ in range(self.num_rows)],
-            'CompetitorPresence': [random.choice([0, 1]) for _ in range(self.num_rows)],
+            'SeasonalityFactor': [random.choice(['Spring', 'Summer', 'Fall', 'Winter']) for _ in range(self.num_rows)],
+            'CompetitorPresence': [random.choice([0, 100]) for _ in range(self.num_rows)],
             'WeatherCondition': [random.choice(['Sunny', 'Cloudy', 'Rainy', 'Snowy']) for _ in range(self.num_rows)]
         }
 
