@@ -5,6 +5,8 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import mysql.connector
 import matplotlib.pyplot as plt
+import tensorflow as tf
+from keras.callbacks import EarlyStopping
 
 class DemandForecaster:
     def __init__(self, host, user, password, database, table_name, batch_size=32):
@@ -73,6 +75,34 @@ class DemandForecaster:
         y = self.data['SalesVolume']
         return train_test_split(X, y, test_size=test_size, shuffle=shuffle)
 
+    def build_lstm_model(self, input_shape):
+        model = tf.keras.Sequential([
+            tf.keras.layers.Dense(500, activation="relu"),
+            tf.keras.layers.Dropout(0.5),
+            tf.keras.layers.Dense(400, activation="relu"),
+            tf.keras.layers.Dropout(0.4),
+            tf.keras.layers.Dense(300, activation="relu"),
+            tf.keras.layers.Dropout(0.3),
+            tf.keras.layers.Dense(200, activation="relu"),
+            tf.keras.layers.Dropout(0.2),
+            tf.keras.layers.Dense(100, activation="relu"),
+            tf.keras.layers.Dropout(0.1),
+            tf.keras.layers.Dense(1)
+        ])
+        model.compile(optimizer='adam', loss='mse')
+        return model
+
+    def train_lstm_model(self, X_train, y_train, epochs=5, batch_size=32):
+        input_shape = (X_train.shape[1],)
+        model = self.build_lstm_model(input_shape)
+        
+        # Early stopping callback
+        early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+        
+        # Training the model
+        history = model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, verbose=1, validation_split=0.2, callbacks=[early_stopping])
+        return model, history
+
     def build_random_forest_model(self):
         return RandomForestRegressor(n_estimators=100, random_state=42)
 
@@ -103,22 +133,31 @@ class DemandForecaster:
 
         X_train, X_test, y_train, y_test = self.split_data()
         
-        # Build and train Random Forest model
+        # Train LSTM model
+        lstm_model, history = self.train_lstm_model(X_train, y_train)
+        
+        # Train Random Forest model
         rf_model = self.build_random_forest_model()
-        trained_model = self.train_model(rf_model, X_train, y_train)
+        rf_model.fit(X_train, y_train)
+        
+        # Make predictions using LSTM
+        y_pred_lstm = lstm_model.predict(X_test).flatten()
         
         # Make predictions using Random Forest
-        y_pred_rf = trained_model.predict(X_test)
+        y_pred_rf = rf_model.predict(X_test)
 
-        # Plot actual vs predicted
-        self.plot_actual_vs_predicted(y_test, y_pred_rf)
+        # Combine predictions (ensemble)
+        y_pred_ensemble = (y_pred_lstm + y_pred_rf) / 2
+        
+        # Plot actual vs ensemble predicted
+        self.plot_actual_vs_predicted(y_test, y_pred_ensemble)
         
         # Evaluate performance
-        mse, mae, r2 = self.evaluate_performance(y_test, y_pred_rf)
+        mse, mae, r2 = self.evaluate_performance(y_test, y_pred_ensemble)
         return mse, mae, r2
 
 if __name__ == "__main__":
-    forecaster = DemandForecaster('localhost', 'root', 'password', 'SupplyChainDB', 'DemandForecasting')
+    forecaster = DemandForecaster('localhost', 'root', '5g6JVu32Dj', 'SupplyChainDB', 'DemandForecasting')
     mse, mae, r2 = forecaster.run_forecasting()
     print(f'Mean Squared Error: {mse}')
     print(f'Mean Absolute Error: {mae}')
