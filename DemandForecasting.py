@@ -51,8 +51,21 @@ class DemandForecaster:
 
     def preprocess_data(self):
         self.data = self.data.dropna()
-        self.data.drop(columns=['Date'], inplace=True)
-        self.data = pd.get_dummies(self.data, columns=['ProductID', 'Promotion', 'Category', 'Brand', 'WeatherCondition'])
+        
+        # One-hot encode categorical variables
+        self.data = pd.get_dummies(self.data, columns=['Promotion', 'Category', 'Brand', 'WeatherCondition'])
+        
+        # Map 'SeasonalityFactor' to numerical values
+        season_mapping = {'Spring': 0, 'Summer': 1, 'Fall': 2, 'Winter': 3}
+        self.data['SeasonalityFactor'] = self.data['SeasonalityFactor'].map(season_mapping)
+        
+        # Normalize numerical features
+        scaler = MinMaxScaler()
+        self.data[['SalesVolume', 'Price', 'CompetitorPresence']] = scaler.fit_transform(self.data[['SalesVolume', 'Price', 'CompetitorPresence']])
+
+        # Convert 'ProductID' to unique numerical identifier
+        self.data['ProductID'] = self.data['ProductID'].apply(lambda x: int(x.split('-')[0], 16)) # Convert UUID to integer
+        
         self.data.reset_index(drop=True, inplace=True)
 
     def split_data(self, test_size=0.2, shuffle=False):
@@ -78,7 +91,7 @@ class DemandForecaster:
         return model
 
     def train_lstm_model(self, X_train, y_train, epochs=5, batch_size=32):
-        model = self.build_lstm_model(input_shape=(X_train.shape[1], X_train.shape[2]))
+        model = self.build_lstm_model(input_shape=(X_train.shape[1],))
         model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, verbose=1)
         return model
 
@@ -105,24 +118,11 @@ class DemandForecaster:
 
         X_train, X_test, y_train, y_test = self.split_data()
         
-        # Normalize data
-        scaler = MinMaxScaler()
-        X_train_scaled = scaler.fit_transform(X_train)
-        X_test_scaled = scaler.transform(X_test)
-        y_train_scaled = scaler.fit_transform(y_train.values.reshape(-1, 1))
-        
-        # Reshape data for LSTM
-        sequence_length = 1  # Set sequence length
-        n_features = X_train_scaled.shape[1]  # Number of features
-        X_train_reshaped = X_train_scaled.reshape((X_train_scaled.shape[0], sequence_length, n_features))
-        X_test_reshaped = X_test_scaled.reshape((X_test_scaled.shape[0], sequence_length, n_features))
-        
         # Train LSTM model
-        lstm_model = self.train_lstm_model(X_train_reshaped, y_train_scaled)
+        lstm_model = self.train_lstm_model(X_train, y_train)
         
         # Make predictions using LSTM
-        y_pred_scaled_lstm = lstm_model.predict(X_test_reshaped)
-        y_pred_lstm = scaler.inverse_transform(y_pred_scaled_lstm.reshape(-1, 1)).flatten()
+        y_pred_lstm = lstm_model.predict(X_test).flatten()
 
         # Plot actual vs predicted
         self.plot_actual_vs_predicted(y_test, y_pred_lstm)

@@ -5,16 +5,16 @@ CREATE DATABASE IF NOT EXISTS SupplyChainDB;
 USE SupplyChainDB;
 
 CREATE TABLE DemandForecasting (
-    ProductID VARCHAR(50) PRIMARY KEY,
+    ProductID VARCHAR(36) PRIMARY KEY,
     Date DATE,
     SalesVolume INT,
-    Price DECIMAL(8, 2),
-    Promotion TINYINT,
-    Category VARCHAR(20),
-    Brand VARCHAR(20),
-    SeasonalityFactor TINYINT,
-    CompetitorPresence TINYINT,
-    WeatherCondition VARCHAR(10)
+    Price DECIMAL(10,2),
+    Promotion BOOLEAN,
+    Category VARCHAR(255),
+    Brand VARCHAR(255),
+    SeasonalityFactor VARCHAR(255),
+    CompetitorPresence INT,
+    WeatherCondition VARCHAR(255)
 );
 
 CREATE TABLE InventoryOptimization (
