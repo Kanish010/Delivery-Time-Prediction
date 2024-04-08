@@ -5,7 +5,7 @@ import os
 import uuid
 
 class DataGenerator:
-    def __init__(self, num_rows=500000):
+    def __init__(self, num_rows=5000):
         self.num_rows = num_rows
         self.fake = Faker()
 
@@ -77,6 +77,8 @@ class DataGenerator:
 
     def generate_lead_time_prediction_data(self):
         data = {
+            #productiondate
+            #num of suppliers
             'OrderDate': [self.fake.date_between(start_date='-5y', end_date='today') for _ in range(self.num_rows)],
             'DeliveryDate': [],
             'OrderQuantity_units': [random.randint(10, 100) for _ in range(self.num_rows)],

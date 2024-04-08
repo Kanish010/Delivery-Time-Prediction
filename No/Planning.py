@@ -48,3 +48,10 @@ Keep 4 seperate codes to generate data anyway
 Add CSV to SQL database functionality
 
 """
+
+
+"""
+Delivery time
+Routing problem
+TSP and VRP
+"""
