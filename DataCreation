@@ -4,7 +4,7 @@ import random
 
 def load_boundary_data(file_path):
     try:
-        boundary_data = gpd.read_file("file_path")
+        boundary_data = gpd.read_file(file_path)
         return boundary_data
     except Exception as e:
         print("Error loading boundary data:", e)
@@ -31,7 +31,12 @@ def filter_points_within_bounds(random_points, boundary_data):
     crs = 'EPSG:4326'   # Coordinate Reference System (CRS) for WGS84
     random_points_gdf = gpd.GeoDataFrame(geometry=gpd.points_from_xy(*zip(*random_points)), crs=crs)
     points_within_bounds = gpd.sjoin(random_points_gdf, boundary_data, predicate='within')
-    return points_within_bounds
+
+    # Extract longitude and latitude into their own columns
+    points_within_bounds['Longitude'] = points_within_bounds.geometry.x
+    points_within_bounds['Latitude'] = points_within_bounds.geometry.y
+
+    return points_within_bounds[['Longitude', 'Latitude']]
 
 def save_points_to_csv(points_df, file_path):
     if points_df is None:
