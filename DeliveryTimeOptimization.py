@@ -1,6 +1,11 @@
 import folium
+import googlemaps
+import polyline
 
-def generate_heat_map(restaurant_location, delivery_location):
+# Google Maps API Key
+API_KEY = 'YOUR_API_KEY'
+
+def generate_road_map(restaurant_location, delivery_location):
     # Create a folium map centered at the restaurant location
     map_center = restaurant_location
     m = folium.Map(location=map_center, zoom_start=12)
@@ -9,16 +14,29 @@ def generate_heat_map(restaurant_location, delivery_location):
     folium.Marker(restaurant_location, popup="Restaurant").add_to(m)
     folium.Marker(delivery_location, popup="Delivery Location").add_to(m)
 
+    # Calculate directions using Google Maps Directions API
+    gmaps = googlemaps.Client(key=API_KEY)
+    directions = gmaps.directions(restaurant_location, delivery_location, mode="driving")
+
+    # Extract the polyline representing the route
+    polyline_points = directions[0]['overview_polyline']['points']
+
+    # Decode the polyline points
+    decoded_points = polyline.decode(polyline_points)
+
+    # Add the route polyline to the map
+    folium.PolyLine(locations=decoded_points, color='blue', weight=5, opacity=0.7, popup="Route").add_to(m)
+
     # Save the map to an HTML file or display it
-    m.save("heat_map.html")
+    m.save("road_map.html")
 
 def main():
     # Sample delivery location and restaurant location (to be input by the user)
     delivery_location = (1.3196, 103.7525)  # Example coordinates
     restaurant_location = (1.2964, 103.7925)  # Example coordinates
 
-    # Generate heat map
-    generate_heat_map(restaurant_location, delivery_location)
+    # Generate road map
+    generate_road_map(restaurant_location, delivery_location)
 
 if __name__ == "__main__":
     main()
