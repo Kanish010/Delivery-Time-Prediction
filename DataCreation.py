@@ -2,6 +2,7 @@ import geopandas as gpd
 import random
 import uuid
 from shapely.geometry import Point
+import numpy as np
 
 def load_boundary_data(file_path):
     try:
@@ -16,24 +17,33 @@ def generate_random_points_within_bounds(boundary_data, num_points, transport_pr
         return None
 
     minx, miny, maxx, maxy = boundary_data.total_bounds
+    
+    # Divide the bounding box into a grid
+    grid_size = int(np.sqrt(num_points))
+    grid_x = np.linspace(minx, maxx, grid_size)
+    grid_y = np.linspace(miny, maxy, grid_size)
+    
     random_points = []
+    
+    for x in grid_x:
+        for y in grid_y:
+            random_lat = random.uniform(y, y + (maxy - miny) / grid_size)
+            random_lon = random.uniform(x, x + (maxx - minx) / grid_size)
+            
+            # Randomly select a transport type based on probabilities
+            transport_type = random.choices(list(transport_probabilities.keys()), weights=transport_probabilities.values())[0]
+            
+            # Generate a unique delivery ID
+            delivery_id = str(uuid.uuid4().hex)[:10]  
+            
+            # Create a point object
+            point = Point(random_lon, random_lat)
 
-    while len(random_points) < num_points:
-        random_lat = random.uniform(miny, maxy)
-        random_lon = random.uniform(minx, maxx)
-
-        # Randomly select a transport type based on probabilities
-        transport_type = random.choices(list(transport_probabilities.keys()), weights=transport_probabilities.values())[0]
-        
-        # Generate a unique delivery ID
-        delivery_id = str(uuid.uuid4().hex)[:10]  
-        
-        # Create a point object
-        point = Point(random_lon, random_lat)
-
-        # Check if the point falls within the boundary
-        if boundary_data.contains(point).any():
-            random_points.append({'Delivery_ID': delivery_id, 'Longitude': random_lon, 'Latitude': random_lat, 'Transport': transport_type})
+            # Check if the point falls within the boundary
+            if boundary_data.contains(point).any():
+                random_points.append({'Delivery_ID': delivery_id, 'Longitude': random_lon, 'Latitude': random_lat, 'Transport': transport_type})
+                if len(random_points) >= num_points:
+                    return random_points
 
     return random_points
 
