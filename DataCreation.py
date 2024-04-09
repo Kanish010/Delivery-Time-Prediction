@@ -3,6 +3,10 @@ import random
 import uuid
 from shapely.geometry import Point
 import numpy as np
+import requests
+
+# Google Maps API Key
+API_KEY = 'YOUR_API_KEY'
 
 def load_boundary_data(file_path):
     try:
@@ -12,7 +16,18 @@ def load_boundary_data(file_path):
         print("Error loading boundary data:", e)
         return None
 
-def generate_random_points_within_bounds(boundary_data, num_points, transport_probabilities):
+def calculate_distance(origin, destination, api_key):
+    url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin[0]},{origin[1]}&destinations={destination[0]},{destination[1]}&key={api_key}"
+    response = requests.get(url)
+    data = response.json()
+    try:
+        distance = data['rows'][0]['elements'][0]['distance']['value']
+    except (KeyError, IndexError):
+        print("Error: Unable to calculate distance.")
+        return None
+    return distance
+
+def generate_random_points_within_bounds(boundary_data, num_points, transport_probabilities, api_key):
     if boundary_data is None:
         return None
 
@@ -46,12 +61,17 @@ def generate_random_points_within_bounds(boundary_data, num_points, transport_pr
 
                 # Check if the point falls within the boundary
                 if boundary_data.contains(point).any():
+                    # Calculate distance between restaurant and delivery point
+                    distance = calculate_distance((restaurant_latitude, restaurant_longitude), (random_lat, random_lon), api_key)
+                    # Assuming a speed of 30 km/h, calculate time in minutes
+                    time_taken = distance / (60 * 1000 / 60)  # Convert speed to meters per minute
                     random_points.append({'Delivery_ID': delivery_id, 
                                           'DeliveryLongitude': random_lon, 
                                           'DeliveryLatitude': random_lat, 
                                           'RestaurantLatitude': restaurant_latitude, 
                                           'RestaurantLongitude': restaurant_longitude,
-                                          'Transport': transport_type})
+                                          'Transport': transport_type,
+                                          'TimeTaken (Minutes)': time_taken})
                     if len(random_points) >= num_points:
                         return random_points
 
@@ -78,11 +98,11 @@ if __name__ == "__main__":
     # Load boundary data
     boundary_data = load_boundary_data(boundary_file_path)
 
-    num_points = 100 
+    num_points = 10
 
     # Generate random points within the bounds of the boundary data
     transport_probabilities = {'motorcycle': 0.5, 'car': 0.2, 'bike': 0.3}  
-    random_points = generate_random_points_within_bounds(boundary_data, num_points, transport_probabilities)
+    random_points = generate_random_points_within_bounds(boundary_data, num_points, transport_probabilities, API_KEY)
 
     # Convert list of dictionaries to GeoDataFrame
     random_points_gdf = gpd.GeoDataFrame(random_points, geometry=gpd.points_from_xy([point['DeliveryLongitude'] for point in random_points], 
@@ -92,4 +112,4 @@ if __name__ == "__main__":
     # Save points to CSV
     if not random_points_gdf.empty:
         save_points_to_csv(random_points_gdf[['Delivery_ID', 'Transport', 'DeliveryLatitude', 'DeliveryLongitude', 
-                                              'RestaurantLatitude', 'RestaurantLongitude']], "TrainingData.csv")
+                                              'RestaurantLatitude', 'RestaurantLongitude', 'TimeTaken (Minutes)']], "TrainingData.csv")
