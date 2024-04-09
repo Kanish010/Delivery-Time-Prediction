@@ -63,8 +63,7 @@ def generate_random_points_within_bounds(boundary_data, num_points, transport_pr
                 if boundary_data.contains(point).any():
                     # Calculate distance between restaurant and delivery point
                     distance = haversine_distance(restaurant_longitude, restaurant_latitude, random_lon, random_lat)
-                    # Assuming a speed of 30 km/h, calculate time in minutes
-                    time_taken = distance / 30 * 60  # speed in km/h, convert to minutes
+                    time_taken = distance / 50 * 60  # speed in km/h, convert to minutes
                     random_points.append({'Delivery_ID': delivery_id, 
                                           'DeliveryLongitude': random_lon, 
                                           'DeliveryLatitude': random_lat, 
