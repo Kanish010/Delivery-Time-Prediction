@@ -7,7 +7,7 @@ This project utilizes machine learning techniques, specifically the RandomForest
 # Dependencies 
 Before running the script, make sure to install the required libraries by executing the following command in your terminal or command prompt:
 
-pip install numpy pandas geopandas geopy uuid shapely folium googlemaps polyline sklearn
+pip install numpy pandas geopandas geopy uuid folium googlemaps polyline sklearn
 
 # Classes
 ### Delivery Time Optimization

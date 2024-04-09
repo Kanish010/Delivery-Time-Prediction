@@ -3,6 +3,7 @@ import random
 import uuid
 from shapely.geometry import Point
 import numpy as np
+from geopy.distance import geodesic
 
 class DataCreation:
     def __init__(self, boundary_file_path):
@@ -17,20 +18,11 @@ class DataCreation:
             print("Error loading boundary data:", e)
             return None
 
-    def haversine_distance(self, lon1, lat1, lon2, lat2):
+    def calculate_distance(self, point1, point2):
         """
         Calculate the great circle distance between two points 
-        on the earth (specified in decimal degrees)
         """
-        # Convert decimal degrees to radians
-        lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
-        dlon = lon2 - lon1 
-        dlat = lat2 - lat1 
-        a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
-        c = 2 * np.arcsin(np.sqrt(a)) 
-        # Radius of earth in kilometers is 6371
-        distance = 6371 * c
-        return distance
+        return geodesic(point1, point2).kilometers
 
     def generate_random_points_within_bounds(self, num_points, transport_probabilities):
         if self.boundary_data is None:
@@ -67,7 +59,9 @@ class DataCreation:
                     # Check if the point falls within the boundary
                     if self.boundary_data.contains(point).any():
                         # Calculate distance between restaurant and delivery point
-                        distance = self.haversine_distance(restaurant_longitude, restaurant_latitude, random_lon, random_lat)
+                        restaurant_point = (restaurant_latitude, restaurant_longitude)
+                        delivery_point = (random_lat, random_lon)
+                        distance = self.calculate_distance(restaurant_point, delivery_point)
                         time_taken = distance / 50 * 60  # speed in km/h, convert to minutes
                         random_points.append({'Delivery_ID': delivery_id, 
                                               'DeliveryLongitude': random_lon, 
