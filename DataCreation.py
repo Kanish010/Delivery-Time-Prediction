@@ -4,9 +4,10 @@ import uuid
 from shapely.geometry import Point
 import numpy as np
 import requests
+import time
 
 # Google Maps API Key
-API_KEY = 'YOUR_API_KEY'
+API_KEY = 'AIzaSyA6sRQ4jKW0BoiFujR6cQy3ZX8-PDulLl8'
 
 def load_boundary_data(file_path):
     try:
@@ -18,14 +19,17 @@ def load_boundary_data(file_path):
 
 def calculate_distance(origin, destination, api_key):
     url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin[0]},{origin[1]}&destinations={destination[0]},{destination[1]}&key={api_key}"
-    response = requests.get(url)
-    data = response.json()
     try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        data = response.json()
         distance = data['rows'][0]['elements'][0]['distance']['value']
+        return distance
+    except requests.RequestException as e:
+        print("Error during API call:", e)
     except (KeyError, IndexError):
         print("Error: Unable to calculate distance.")
-        return None
-    return distance
+    return None
 
 def generate_random_points_within_bounds(boundary_data, num_points, transport_probabilities, api_key):
     if boundary_data is None:
@@ -63,17 +67,21 @@ def generate_random_points_within_bounds(boundary_data, num_points, transport_pr
                 if boundary_data.contains(point).any():
                     # Calculate distance between restaurant and delivery point
                     distance = calculate_distance((restaurant_latitude, restaurant_longitude), (random_lat, random_lon), api_key)
-                    # Assuming a speed of 30 km/h, calculate time in minutes
-                    time_taken = distance / (60 * 1000 / 60)  # Convert speed to meters per minute
-                    random_points.append({'Delivery_ID': delivery_id, 
-                                          'DeliveryLongitude': random_lon, 
-                                          'DeliveryLatitude': random_lat, 
-                                          'RestaurantLatitude': restaurant_latitude, 
-                                          'RestaurantLongitude': restaurant_longitude,
-                                          'Transport': transport_type,
-                                          'TimeTaken (Minutes)': time_taken})
-                    if len(random_points) >= num_points:
-                        return random_points
+                    if distance is not None:
+                        # Assuming a speed of 30 km/h, calculate time in minutes
+                        time_taken = distance / (60 * 1000 / 60)  # Convert speed to meters per minute
+                        random_points.append({'Delivery_ID': delivery_id, 
+                                              'DeliveryLongitude': random_lon, 
+                                              'DeliveryLatitude': random_lat, 
+                                              'RestaurantLatitude': restaurant_latitude, 
+                                              'RestaurantLongitude': restaurant_longitude,
+                                              'Transport': transport_type,
+                                              'TimeTaken (Minutes)': time_taken})
+                        if len(random_points) >= num_points:
+                            return random_points
+                    else:
+                        print("API limit reached. Waiting before making next request...")
+                        time.sleep(1)  # Wait for 1 second before making the next request
 
         # If not enough points were generated, increase the grid size
         grid_size += 1
