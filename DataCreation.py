@@ -98,7 +98,7 @@ if __name__ == "__main__":
     # Load boundary data
     boundary_data = load_boundary_data(boundary_file_path)
 
-    num_points = 45000
+    num_points = 500
 
     # Generate random points within the bounds of the boundary data
     transport_probabilities = {'motorcycle': 0.5, 'car': 0.2, 'bike': 0.3}  
