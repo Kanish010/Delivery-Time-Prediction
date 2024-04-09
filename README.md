@@ -11,8 +11,8 @@ pip install numpy pandas geopandas geopy uuid shapely folium googlemaps polyline
 
 # Classes
 ### Delivery Time Optimization
-This class encapsulates the functionality related to predicting delivery times and generating road maps.
-- It includes methods for loading training data, training the model, predicting delivery times, and generating road maps.
+This class encapsulates the functionality related to predicting delivery times and generating road map. It includes methods for loading training data, training the model, predicting delivery times, and generating road maps.
+
 - Key methods include:
   - `load_training_data`: Loads training data from a CSV file.
   - `train_model`: Trains the RandomForestRegressor model on the loaded training data.
@@ -20,8 +20,8 @@ This class encapsulates the functionality related to predicting delivery times a
   - `generate_road_map`: Generates a road map visualization showing the delivery route and predicted delivery time.
 
 ### Data Creation
-The Data Creation class is responsible for generating synthetic delivery data for training the prediction model.
-- It includes methods for loading boundary data, generating random delivery points within the boundary, and saving the generated data to a CSV file.
+The Data Creation class is responsible for generating synthetic delivery data for training the prediction model. It includes methods for loading boundary data, generating random delivery points within the boundary, and saving the generated data to a CSV file.
+
 - Key methods include:
   - `load_boundary_data`: Loads boundary data from a GeoJSON file.
   - `haversine_distance`: Calculates the great circle distance between two points on the earth's surface.
