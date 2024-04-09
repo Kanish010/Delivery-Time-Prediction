@@ -27,8 +27,8 @@ def generate_road_map(restaurant_location, delivery_location, predicted_time, gm
     folium.Marker(restaurant_location, popup="Restaurant").add_to(m)
     delivery_marker = folium.Marker(delivery_location).add_to(m)
 
-    # Concatenate popup text
-    popup_text = "Predicted Delivery Time: {} minutes".format(predicted_time)
+    # Concatenate popup text with predicted time rounded to 2 significant figures
+    popup_text = "Predicted Delivery Time: {:.2f} minutes".format(predicted_time)
 
     # Add delivery duration as popup
     folium.Popup(popup_text).add_to(delivery_marker)
@@ -74,8 +74,9 @@ def main():
     model = train_model(training_data)
 
     # Predict delivery time
-    predicted_time = model.predict(np.array([delivery_location[0], delivery_location[1], 
-                                             restaurant_location[0], restaurant_location[1]]).reshape(1, -1))[0]
+    features = np.array([delivery_location[0], delivery_location[1], 
+                         restaurant_location[0], restaurant_location[1]]).reshape(1, -1)
+    predicted_time = model.predict(features)[0]
 
     # Generate road map
     generate_road_map(restaurant_location, delivery_location, predicted_time, gmaps)
