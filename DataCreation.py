@@ -3,11 +3,6 @@ import random
 import uuid
 from shapely.geometry import Point
 import numpy as np
-import requests
-import time
-
-# Google Maps API Key
-API_KEY = 'YOUR_API_KEY'
 
 def load_boundary_data(file_path):
     try:
@@ -17,21 +12,22 @@ def load_boundary_data(file_path):
         print("Error loading boundary data:", e)
         return None
 
-def calculate_distance(origin, destination, api_key):
-    url = f"https://maps.googleapis.com/maps/api/distancematrix/json?origins={origin[0]},{origin[1]}&destinations={destination[0]},{destination[1]}&key={api_key}"
-    try:
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an exception for HTTP errors
-        data = response.json()
-        distance = data['rows'][0]['elements'][0]['distance']['value']
-        return distance
-    except requests.RequestException as e:
-        print("Error during API call:", e)
-    except (KeyError, IndexError):
-        print("Error: Unable to calculate distance.")
-    return None
+def haversine_distance(lon1, lat1, lon2, lat2):
+    """
+    Calculate the great circle distance between two points 
+    on the earth (specified in decimal degrees)
+    """
+    # Convert decimal degrees to radians
+    lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
+    dlon = lon2 - lon1 
+    dlat = lat2 - lat1 
+    a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
+    c = 2 * np.arcsin(np.sqrt(a)) 
+    # Radius of earth in kilometers is 6371
+    distance = 6371 * c
+    return distance
 
-def generate_random_points_within_bounds(boundary_data, num_points, transport_probabilities, api_key):
+def generate_random_points_within_bounds(boundary_data, num_points, transport_probabilities):
     if boundary_data is None:
         return None
 
@@ -66,22 +62,17 @@ def generate_random_points_within_bounds(boundary_data, num_points, transport_pr
                 # Check if the point falls within the boundary
                 if boundary_data.contains(point).any():
                     # Calculate distance between restaurant and delivery point
-                    distance = calculate_distance((restaurant_latitude, restaurant_longitude), (random_lat, random_lon), api_key)
-                    if distance is not None:
-                        # Assuming a speed of 30 km/h, calculate time in minutes
-                        time_taken = distance / (60 * 1000 / 60)  # Convert speed to meters per minute
-                        random_points.append({'Delivery_ID': delivery_id, 
-                                              'DeliveryLongitude': random_lon, 
-                                              'DeliveryLatitude': random_lat, 
-                                              'RestaurantLatitude': restaurant_latitude, 
-                                              'RestaurantLongitude': restaurant_longitude,
-                                              'Transport': transport_type,
-                                              'TimeTaken (Minutes)': time_taken})
-                        if len(random_points) >= num_points:
-                            return random_points
-                    else:
-                        print("API limit reached. Waiting before making next request...")
-                        time.sleep(5)  # Wait for 5 second before making the next request
+                    distance = haversine_distance(restaurant_longitude, restaurant_latitude, random_lon, random_lat)
+                    time_taken = distance / 50 * 60  # speed in km/h, convert to minutes
+                    random_points.append({'Delivery_ID': delivery_id, 
+                                          'DeliveryLongitude': random_lon, 
+                                          'DeliveryLatitude': random_lat, 
+                                          'RestaurantLatitude': restaurant_latitude, 
+                                          'RestaurantLongitude': restaurant_longitude,
+                                          'Transport': transport_type,
+                                          'TimeTaken (Minutes)': time_taken})
+                    if len(random_points) >= num_points:
+                        return random_points
 
         # If not enough points were generated, increase the grid size
         grid_size += 1
@@ -106,11 +97,11 @@ if __name__ == "__main__":
     # Load boundary data
     boundary_data = load_boundary_data(boundary_file_path)
 
-    num_points = 10
+    num_points = 100
 
     # Generate random points within the bounds of the boundary data
     transport_probabilities = {'motorcycle': 0.5, 'car': 0.2, 'bike': 0.3}  
-    random_points = generate_random_points_within_bounds(boundary_data, num_points, transport_probabilities, API_KEY)
+    random_points = generate_random_points_within_bounds(boundary_data, num_points, transport_probabilities)
 
     # Convert list of dictionaries to GeoDataFrame
     random_points_gdf = gpd.GeoDataFrame(random_points, geometry=gpd.points_from_xy([point['DeliveryLongitude'] for point in random_points], 
