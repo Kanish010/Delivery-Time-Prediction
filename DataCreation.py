@@ -68,7 +68,7 @@ class DataCreation:
                     if self.boundary_data.contains(point).any():
                         # Calculate distance between restaurant and delivery point
                         distance = self.haversine_distance(restaurant_longitude, restaurant_latitude, random_lon, random_lat)
-                        time_taken = distance / 45 * 60  # speed in km/h, convert to minutes
+                        time_taken = distance / 50 * 60  # speed in km/h, convert to minutes
                         random_points.append({'Delivery_ID': delivery_id, 
                                               'DeliveryLongitude': random_lon, 
                                               'DeliveryLatitude': random_lat, 
