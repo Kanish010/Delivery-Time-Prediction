@@ -6,19 +6,20 @@ import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+from geopy.distance import geodesic
 
 # Google Maps API Key
-API_KEY = 'YOUR_API_KEY'
+API_KEY = 'AIzaSyA6sRQ4jKW0BoiFujR6cQy3ZX8-PDulLl8'
 
 def load_training_data(file_path):
     try:
-        data = pd.read_csv("TrainingData.csv")
+        data = pd.read_csv(file_path)
         return data
     except Exception as e:
         print("Error loading training data:", e)
         return None
 
-def generate_road_map(restaurant_location, delivery_location, predicted_time, gmaps):
+def generate_road_map(restaurant_location, delivery_location, predicted_time, distance, gmaps):
     # Create a folium map centered at the restaurant location
     map_center = restaurant_location
     m = folium.Map(location=map_center, zoom_start=12)
@@ -27,10 +28,10 @@ def generate_road_map(restaurant_location, delivery_location, predicted_time, gm
     folium.Marker(restaurant_location, popup="Restaurant").add_to(m)
     delivery_marker = folium.Marker(delivery_location).add_to(m)
 
-    # Concatenate popup text with predicted time rounded to 2 significant figures
-    popup_text = "Predicted Delivery Time: {:.2f} minutes".format(predicted_time)
+    # Concatenate popup text with predicted time and distance rounded to 2 significant figures
+    popup_text = "Predicted Delivery Time: {:.2f} minutes\n Distance: {:.2f} km".format(predicted_time, distance)
 
-    # Add delivery duration as popup
+    # Add delivery duration and distance as popup
     folium.Popup(popup_text).add_to(delivery_marker)
 
     # Generate road map with route polyline
@@ -43,7 +44,7 @@ def generate_road_map(restaurant_location, delivery_location, predicted_time, gm
     m.save("Delivery_Route.html")
 
 def train_model(data):
-    X = data[['DeliveryLatitude', 'DeliveryLongitude', 'RestaurantLatitude', 'RestaurantLongitude']]
+    X = data[['DeliveryLatitude', 'DeliveryLongitude', 'RestaurantLatitude', 'RestaurantLongitude', 'Distance (Km)']]
     y = data['TimeTaken (Minutes)']
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     model = RandomForestRegressor(n_estimators=100, random_state=42)
@@ -66,8 +67,7 @@ def main():
     # Sample delivery location and restaurant location (to be input by the user)
     delivery_location = (1.3196, 103.7525)  # Example coordinates
     restaurant_location = (1.2964, 103.7925)  # Example coordinates
-    #restaurant_location = (1.3344, 103.7428)
-    #restaurant_location = (1.3343, 103.9627)
+    #restaurant_location = (1.3644, 103.9915)
 
     # Initialize Google Maps client
     gmaps = googlemaps.Client(key=API_KEY)
@@ -75,13 +75,16 @@ def main():
     # Train model
     model = train_model(training_data)
 
+    # Calculate distance between delivery and restaurant locations
+    distance = geodesic(delivery_location, restaurant_location).kilometers
+
     # Predict delivery time
     features = np.array([delivery_location[0], delivery_location[1], 
-                         restaurant_location[0], restaurant_location[1]]).reshape(1, -1)
+                         restaurant_location[0], restaurant_location[1], distance]).reshape(1, -1)
     predicted_time = model.predict(features)[0]
 
     # Generate road map
-    generate_road_map(restaurant_location, delivery_location, predicted_time, gmaps)
+    generate_road_map(restaurant_location, delivery_location, predicted_time, distance, gmaps)
 
 if __name__ == "__main__":
     main()
