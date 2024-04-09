@@ -12,11 +12,20 @@ def generate_road_map(restaurant_location, delivery_location):
 
     # Add marker for restaurant and delivery location
     folium.Marker(restaurant_location, popup="Restaurant").add_to(m)
-    delivery_marker = folium.Marker(delivery_location, popup="Delivery Location").add_to(m)
+    delivery_marker = folium.Marker(delivery_location).add_to(m)
 
     # Calculate directions using Google Maps Directions API
     gmaps = googlemaps.Client(key=API_KEY)
     directions = gmaps.directions(restaurant_location, delivery_location, mode="driving")
+
+    # Extract duration from the directions
+    duration_text = directions[0]['legs'][0]['duration']['text']
+
+    # Concatenate popup text
+    popup_text = "Delivery Location: {}".format(duration_text)
+
+    # Add delivery duration as popup
+    folium.Popup(popup_text).add_to(delivery_marker)
 
     # Extract the polyline representing the route
     polyline_points = directions[0]['overview_polyline']['points']
@@ -25,16 +34,10 @@ def generate_road_map(restaurant_location, delivery_location):
     decoded_points = polyline.decode(polyline_points)
 
     # Add the route polyline to the map
-    folium.PolyLine(locations=decoded_points, color='blue', weight=5, opacity=0.7, popup="Route").add_to(m)
-
-    # Extract duration from the directions
-    duration_text = directions[0]['legs'][0]['duration']['text']
-
-    # Add delivery duration as popup
-    delivery_marker.add_child(folium.Popup(duration_text))
+    folium.PolyLine(locations=decoded_points, color='blue', weight=5, opacity=0.7, popup="Delivery Route").add_to(m)
 
     # Save the map to an HTML file or display it
-    m.save("road_map.html")
+    m.save("Delivery_Route.html")
 
 def main():
     # Sample delivery location and restaurant location (to be input by the user)
