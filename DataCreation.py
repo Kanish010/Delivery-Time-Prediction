@@ -1,6 +1,7 @@
 import geopandas as gpd
 import random
 import uuid
+from shapely.geometry import Point
 
 def load_boundary_data(file_path):
     try:
@@ -17,7 +18,7 @@ def generate_random_points_within_bounds(boundary_data, num_points, transport_pr
     minx, miny, maxx, maxy = boundary_data.total_bounds
     random_points = []
 
-    for _ in range(num_points):
+    while len(random_points) < num_points:
         random_lat = random.uniform(miny, maxy)
         random_lon = random.uniform(minx, maxx)
 
@@ -27,7 +28,12 @@ def generate_random_points_within_bounds(boundary_data, num_points, transport_pr
         # Generate a unique delivery ID
         delivery_id = str(uuid.uuid4().hex)[:10]  
         
-        random_points.append({'Delivery_ID': delivery_id, 'Longitude': random_lon, 'Latitude': random_lat, 'Transport': transport_type})
+        # Create a point object
+        point = Point(random_lon, random_lat)
+
+        # Check if the point falls within the boundary
+        if boundary_data.contains(point).any():
+            random_points.append({'Delivery_ID': delivery_id, 'Longitude': random_lon, 'Latitude': random_lat, 'Transport': transport_type})
 
     return random_points
 
@@ -44,14 +50,15 @@ def save_points_to_csv(points_df, file_path):
 # Main code execution
 if __name__ == "__main__":
     # File path to the boundary data
-    boundary_file_path = "Singapore.geojson"
+    boundary_file_path = ("Singapore.geojson")
 
     # Load boundary data
     boundary_data = load_boundary_data(boundary_file_path)
 
+    num_points = 100 
+
     # Generate random points within the bounds of the boundary data
-    num_points = 100
-    transport_probabilities = {'motorcycle': 0.5, 'car': 0.4, 'bike': 0.1}  # Adjust probabilities as needed
+    transport_probabilities = {'motorcycle': 0.5, 'car': 0.2, 'bike': 0.3}  # Adjust probabilities as needed
     random_points = generate_random_points_within_bounds(boundary_data, num_points, transport_probabilities)
 
     # Convert list of dictionaries to GeoDataFrame
@@ -59,9 +66,6 @@ if __name__ == "__main__":
                                                                                     [point['Latitude'] for point in random_points]),
                                          crs='EPSG:4326')
 
-    # Filter points within the boundary
-    points_within_bounds = gpd.sjoin(random_points_gdf, boundary_data, predicate='within')
-
     # Save points to CSV
-    if not points_within_bounds.empty:
-        save_points_to_csv(points_within_bounds[['Delivery_ID', 'Transport', 'Longitude', 'Latitude']], "points_within_singapore.csv")
+    if not random_points_gdf.empty:
+        save_points_to_csv(random_points_gdf[['Delivery_ID', 'Transport', 'Longitude', 'Latitude']], "TrainingData.csv")
