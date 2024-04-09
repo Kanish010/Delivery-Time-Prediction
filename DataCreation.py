@@ -70,6 +70,7 @@ def generate_random_points_within_bounds(boundary_data, num_points, transport_pr
                                           'RestaurantLatitude': restaurant_latitude, 
                                           'RestaurantLongitude': restaurant_longitude,
                                           'Transport': transport_type,
+                                          'Distance (Km)': distance, 
                                           'TimeTaken (Minutes)': time_taken})
                     if len(random_points) >= num_points:
                         return random_points
@@ -111,4 +112,5 @@ if __name__ == "__main__":
     # Save points to CSV
     if not random_points_gdf.empty:
         save_points_to_csv(random_points_gdf[['Delivery_ID', 'Transport', 'DeliveryLatitude', 'DeliveryLongitude', 
-                                              'RestaurantLatitude', 'RestaurantLongitude', 'TimeTaken (Minutes)']], "TrainingData.csv")
+                                              'RestaurantLatitude', 'RestaurantLongitude', 'Distance (Km)', 'TimeTaken (Minutes)']], 
+                                              "TrainingData.csv")
