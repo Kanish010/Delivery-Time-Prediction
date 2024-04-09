@@ -66,6 +66,8 @@ def main():
     # Sample delivery location and restaurant location (to be input by the user)
     delivery_location = (1.3196, 103.7525)  # Example coordinates
     restaurant_location = (1.2964, 103.7925)  # Example coordinates
+    #restaurant_location = (1.3344, 103.7428)
+    #restaurant_location = (1.3343, 103.9627)
 
     # Initialize Google Maps client
     gmaps = googlemaps.Client(key=API_KEY)
