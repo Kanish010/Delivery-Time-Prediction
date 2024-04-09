@@ -63,11 +63,13 @@ class DeliveryTimePredictor:
         m.save("Delivery_Route.html")
 
 def main():
-    API_KEY = 'YOUR_API_KEY'
+    API_KEY = 'AIzaSyA6sRQ4jKW0BoiFujR6cQy3ZX8-PDulLl8'
     file_path = 'TrainingData.csv'
     delivery_location = (1.3196, 103.7525)
     restaurant_location = (1.2964, 103.7925)
-    #delivery_location = (1.2668, 103.8107)
+
+    #Other example locations, simply comment the above an uncomment which ones you want to use
+    #delivery_location = (1.2668, 103.8107) 
     #restaurant_location = (1.3644, 103.9915)
     #delivery_location = (1.3471, 103.7654)
     #restaurant_location = (1.3039, 103.8319)
