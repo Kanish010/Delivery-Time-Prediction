@@ -1,9 +1,10 @@
 import geopandas as gpd
 import random
+import uuid
 
 def load_boundary_data(file_path):
     try:
-        boundary_data = gpd.read_file(file_path)
+        boundary_data = gpd.read_file("file_path")
         return boundary_data
     except Exception as e:
         print("Error loading boundary data:", e)
@@ -22,7 +23,11 @@ def generate_random_points_within_bounds(boundary_data, num_points, transport_pr
 
         # Randomly select a transport type based on probabilities
         transport_type = random.choices(list(transport_probabilities.keys()), weights=transport_probabilities.values())[0]
-        random_points.append({'Longitude': random_lon, 'Latitude': random_lat, 'Transport': transport_type})
+        
+        # Generate a unique delivery ID
+        delivery_id = str(uuid.uuid4().hex)[:10]  
+        
+        random_points.append({'Delivery_ID': delivery_id, 'Longitude': random_lon, 'Latitude': random_lat, 'Transport': transport_type})
 
     return random_points
 
@@ -46,7 +51,7 @@ if __name__ == "__main__":
 
     # Generate random points within the bounds of the boundary data
     num_points = 100
-    transport_probabilities = {'motorcycle': 0.2, 'car': 0.6, 'bike': 0.2}  # Adjust probabilities as needed
+    transport_probabilities = {'motorcycle': 0.5, 'car': 0.4, 'bike': 0.1}  # Adjust probabilities as needed
     random_points = generate_random_points_within_bounds(boundary_data, num_points, transport_probabilities)
 
     # Convert list of dictionaries to GeoDataFrame
@@ -59,4 +64,4 @@ if __name__ == "__main__":
 
     # Save points to CSV
     if not points_within_bounds.empty:
-        save_points_to_csv(points_within_bounds[['Longitude', 'Latitude', 'Transport']], "points_within_singapore.csv")
+        save_points_to_csv(points_within_bounds[['Delivery_ID', 'Transport', 'Longitude', 'Latitude']], "points_within_singapore.csv")
