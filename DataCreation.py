@@ -4,7 +4,7 @@ import uuid
 
 def load_boundary_data(file_path):
     try:
-        boundary_data = gpd.read_file("file_path")
+        boundary_data = gpd.read_file("Singapore.geojson")
         return boundary_data
     except Exception as e:
         print("Error loading boundary data:", e)
@@ -44,7 +44,7 @@ def save_points_to_csv(points_df, file_path):
 # Main code execution
 if __name__ == "__main__":
     # File path to the boundary data
-    boundary_file_path = "File_path"
+    boundary_file_path = "Singapore.geojson"
 
     # Load boundary data
     boundary_data = load_boundary_data(boundary_file_path)
