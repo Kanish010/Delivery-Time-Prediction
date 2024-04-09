@@ -27,3 +27,8 @@ The Data Creation class is responsible for generating synthetic delivery data fo
   - `haversine_distance`: Calculates the great circle distance between two points on the earth's surface.
   - `generate_random_points_within_bounds`: Generates random delivery points within the specified boundary.
   - `save_points_to_csv`: Saves the generated delivery points to a CSV file.
+
+## Model Performance
+Mean Squared Error: 0.0020149730562482706
+Mean Absolute Error: 0.03051970770704708
+r^2 Score: 0.9999781611246882

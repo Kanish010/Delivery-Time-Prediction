@@ -99,7 +99,7 @@ class DataCreation:
 if __name__ == "__main__":
     generator = DataCreation("Singapore.geojson")
 
-    num_points = 1000
+    num_points = 5000
 
     # Generate random points within the bounds of the boundary data
     transport_probabilities = {'motorcycle': 0.5, 'car': 0.2, 'bike': 0.3}  
