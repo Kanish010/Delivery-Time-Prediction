@@ -67,6 +67,10 @@ def main():
     file_path = 'TrainingData.csv'
     delivery_location = (1.3196, 103.7525)
     restaurant_location = (1.2964, 103.7925)
+    #delivery_location = (1.2668, 103.8107)
+    #restaurant_location = (1.3644, 103.9915)
+    #delivery_location = (1.3471, 103.7654)
+    #restaurant_location = (1.3039, 103.8319)
 
     predictor = DeliveryTimePredictor(API_KEY, file_path)
     predictor.load_training_data()
