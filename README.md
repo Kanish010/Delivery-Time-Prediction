@@ -29,6 +29,6 @@ The Data Creation class is responsible for generating synthetic delivery data fo
   - `save_points_to_csv`: Saves the generated delivery points to a CSV file.
 
 ## Model Performance
-Mean Squared Error: 0.0014543213246330222
-Mean Absolute Error: 0.009358326249831997
-r^2 Score: 0.9999913645668616
+Mean Squared Error: 0.00007539039416473184
+Mean Absolute Error: 0.005282038913738968
+r^2 Score: 0.9999988488154825
