@@ -7,7 +7,7 @@ import requests
 import time
 
 # Google Maps API Key
-API_KEY = 'AIzaSyA6sRQ4jKW0BoiFujR6cQy3ZX8-PDulLl8'
+API_KEY = 'YOUR_API_KEY'
 
 def load_boundary_data(file_path):
     try:
