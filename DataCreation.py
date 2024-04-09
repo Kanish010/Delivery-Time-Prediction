@@ -81,7 +81,7 @@ def generate_random_points_within_bounds(boundary_data, num_points, transport_pr
                             return random_points
                     else:
                         print("API limit reached. Waiting before making next request...")
-                        time.sleep(1)  # Wait for 1 second before making the next request
+                        time.sleep(5)  # Wait for 5 second before making the next request
 
         # If not enough points were generated, increase the grid size
         grid_size += 1
