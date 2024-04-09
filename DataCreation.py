@@ -18,32 +18,45 @@ def generate_random_points_within_bounds(boundary_data, num_points, transport_pr
 
     minx, miny, maxx, maxy = boundary_data.total_bounds
     
-    # Divide the bounding box into a grid
-    grid_size = int(np.sqrt(num_points))
-    grid_x = np.linspace(minx, maxx, grid_size)
-    grid_y = np.linspace(miny, maxy, grid_size)
+    # Generate random latitude and longitude for the restaurant within Singapore bounds
+    restaurant_latitude = random.uniform(miny, maxy)
+    restaurant_longitude = random.uniform(minx, maxx)
     
+    # Start with a grid size equal to the square root of the desired number of points
+    grid_size = int(np.sqrt(num_points))
     random_points = []
     
-    for x in grid_x:
-        for y in grid_y:
-            random_lat = random.uniform(y, y + (maxy - miny) / grid_size)
-            random_lon = random.uniform(x, x + (maxx - minx) / grid_size)
-            
-            # Randomly select a transport type based on probabilities
-            transport_type = random.choices(list(transport_probabilities.keys()), weights=transport_probabilities.values())[0]
-            
-            # Generate a unique delivery ID
-            delivery_id = str(uuid.uuid4().hex)[:10]  
-            
-            # Create a point object
-            point = Point(random_lon, random_lat)
+    while len(random_points) < num_points:
+        grid_x = np.linspace(minx, maxx, grid_size)
+        grid_y = np.linspace(miny, maxy, grid_size)
 
-            # Check if the point falls within the boundary
-            if boundary_data.contains(point).any():
-                random_points.append({'Delivery_ID': delivery_id, 'Longitude': random_lon, 'Latitude': random_lat, 'Transport': transport_type})
-                if len(random_points) >= num_points:
-                    return random_points
+        for x in grid_x:
+            for y in grid_y:
+                random_lat = random.uniform(y, y + (maxy - miny) / grid_size)
+                random_lon = random.uniform(x, x + (maxx - minx) / grid_size)
+                
+                # Randomly select a transport type based on probabilities
+                transport_type = random.choices(list(transport_probabilities.keys()), weights=transport_probabilities.values())[0]
+                
+                # Generate a unique delivery ID
+                delivery_id = str(uuid.uuid4().hex)[:10]  
+                
+                # Create a point object
+                point = Point(random_lon, random_lat)
+
+                # Check if the point falls within the boundary
+                if boundary_data.contains(point).any():
+                    random_points.append({'Delivery_ID': delivery_id, 
+                                          'DeliveryLongitude': random_lon, 
+                                          'DeliveryLatitude': random_lat, 
+                                          'RestaurantLatitude': restaurant_latitude, 
+                                          'RestaurantLongitude': restaurant_longitude,
+                                          'Transport': transport_type})
+                    if len(random_points) >= num_points:
+                        return random_points
+
+        # If not enough points were generated, increase the grid size
+        grid_size += 1
 
     return random_points
 
@@ -60,7 +73,7 @@ def save_points_to_csv(points_df, file_path):
 # Main code execution
 if __name__ == "__main__":
     # File path to the boundary data
-    boundary_file_path = ("Singapore.geojson")
+    boundary_file_path = "Singapore.geojson"
 
     # Load boundary data
     boundary_data = load_boundary_data(boundary_file_path)
@@ -72,10 +85,11 @@ if __name__ == "__main__":
     random_points = generate_random_points_within_bounds(boundary_data, num_points, transport_probabilities)
 
     # Convert list of dictionaries to GeoDataFrame
-    random_points_gdf = gpd.GeoDataFrame(random_points, geometry=gpd.points_from_xy([point['Longitude'] for point in random_points], 
-                                                                                    [point['Latitude'] for point in random_points]),
+    random_points_gdf = gpd.GeoDataFrame(random_points, geometry=gpd.points_from_xy([point['DeliveryLongitude'] for point in random_points], 
+                                                                                    [point['DeliveryLatitude'] for point in random_points]),
                                          crs='EPSG:4326')
 
     # Save points to CSV
     if not random_points_gdf.empty:
-        save_points_to_csv(random_points_gdf[['Delivery_ID', 'Transport', 'Longitude', 'Latitude']], "TrainingData.csv")
+        save_points_to_csv(random_points_gdf[['Delivery_ID', 'Transport', 'DeliveryLatitude', 'DeliveryLongitude', 
+                                              'RestaurantLatitude', 'RestaurantLongitude']], "TrainingData.csv")
