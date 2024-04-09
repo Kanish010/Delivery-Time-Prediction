@@ -1,6 +1,6 @@
 # Delivery Time Prediction
 
-The Delivery Time Prediction project aims to predict the time it takes for a delivery to reach its destination from a restaurant location. This prediction is based on factors such as the geographical coordinates of the delivery and restaurant locations, as well as the distance between them.
+The Delivery Time Prediction project aims to predict the time it takes for a delivery to reach its destination from a restaurant location in Singapore. This prediction is based on factors such as the geographical coordinates of the delivery and restaurant locations, as well as the distance between them.
 
 This project utilizes machine learning techniques, specifically the RandomForestRegressor algorithm, to train a model on historical delivery data. The trained model can then be used to predict delivery times for new orders based on their locations.
 
