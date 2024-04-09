@@ -81,7 +81,7 @@ if __name__ == "__main__":
     num_points = 100 
 
     # Generate random points within the bounds of the boundary data
-    transport_probabilities = {'motorcycle': 0.5, 'car': 0.2, 'bike': 0.3}  # Adjust probabilities as needed
+    transport_probabilities = {'motorcycle': 0.5, 'car': 0.2, 'bike': 0.3}  
     random_points = generate_random_points_within_bounds(boundary_data, num_points, transport_probabilities)
 
     # Convert list of dictionaries to GeoDataFrame
