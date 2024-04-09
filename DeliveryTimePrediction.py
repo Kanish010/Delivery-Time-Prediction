@@ -3,10 +3,10 @@ import folium
 import googlemaps
 import polyline
 import numpy as np
+from geopy.distance import geodesic
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-from geopy.distance import geodesic
 
 class DeliveryTimePredictor:
     def __init__(self, api_key, file_path):
