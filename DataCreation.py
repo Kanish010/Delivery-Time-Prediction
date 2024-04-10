@@ -2,7 +2,6 @@ import geopandas as gpd
 import random
 import uuid
 from shapely.geometry import Point
-import numpy as np
 from geopy.distance import geodesic
 from shapely.ops import unary_union
 from concurrent.futures import ProcessPoolExecutor
@@ -11,11 +10,12 @@ class DataCreation:
     def __init__(self, boundary_file_path):
         self.boundary_file_path = boundary_file_path
         self.boundary_data = self.load_boundary_data()
+        self.restaurant_latitude = None
+        self.restaurant_longitude = None
 
     def load_boundary_data(self):
         try:
-            boundary_data = gpd.read_file(self.boundary_file_path)
-            return boundary_data
+            return gpd.read_file(self.boundary_file_path)
         except Exception as e:
             print("Error loading boundary data:", e)
             return None
@@ -31,10 +31,6 @@ class DataCreation:
             return None
 
         minx, miny, maxx, maxy = self.boundary_data.total_bounds
-        
-        # Generate random latitude and longitude for the restaurant within Singapore bounds
-        restaurant_latitude = random.uniform(miny, maxy)
-        restaurant_longitude = random.uniform(minx, maxx)
         
         # Create a single polygon for boundary check
         boundary_polygon = unary_union(self.boundary_data.geometry)
@@ -52,15 +48,17 @@ class DataCreation:
                 delivery_id = str(uuid.uuid4().hex)[:10]  
                 
                 # Calculate distance between restaurant and delivery point
-                delivery_point = (random_point.y, random_point.x)
-                distance = self.calculate_distance((restaurant_latitude, restaurant_longitude), delivery_point)
+                if self.restaurant_latitude is None or self.restaurant_longitude is None:
+                    self.restaurant_latitude = random.uniform(miny, maxy)
+                    self.restaurant_longitude = random.uniform(minx, maxx)
+                distance = self.calculate_distance((self.restaurant_latitude, self.restaurant_longitude), (random_point.y, random_point.x))
                 time_taken = distance / 50 * 60  # assuming avg speed 50kmh
                 
                 random_points.append({'Delivery_ID': delivery_id, 
                                       'DeliveryLongitude': random_point.x, 
                                       'DeliveryLatitude': random_point.y, 
-                                      'RestaurantLatitude': restaurant_latitude, 
-                                      'RestaurantLongitude': restaurant_longitude,
+                                      'RestaurantLatitude': self.restaurant_latitude, 
+                                      'RestaurantLongitude': self.restaurant_longitude,
                                       'Transport': transport_type,
                                       'Distance (Km)': distance, 
                                       'TimeTaken (Minutes)': time_taken})
@@ -98,7 +96,7 @@ if __name__ == "__main__":
     random_points_gdf = gpd.GeoDataFrame(random_points, geometry=gpd.points_from_xy([point['DeliveryLongitude'] for point in random_points], 
                                                                                     [point['DeliveryLatitude'] for point in random_points]),
                                          crs='EPSG:4326')
-
+    
     # Save points to CSV
     if not random_points_gdf.empty:
         generator.save_points_to_csv(random_points_gdf[['Delivery_ID', 'Transport', 'DeliveryLatitude', 'DeliveryLongitude', 

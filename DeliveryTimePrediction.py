@@ -2,7 +2,6 @@ import pandas as pd
 import folium
 import googlemaps
 import polyline
-import numpy as np
 from geopy.distance import geodesic
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
@@ -40,8 +39,7 @@ class DeliveryTimePredictor:
 
     def predict_delivery_time(self, delivery_location, restaurant_location):
         distance = geodesic(delivery_location, restaurant_location).kilometers
-        features = np.array([delivery_location[0], delivery_location[1], 
-                             restaurant_location[0], restaurant_location[1], distance]).reshape(1, -1)
+        features = [[*delivery_location, *restaurant_location, distance]]
         predicted_time = self.model.predict(features)[0]
         return predicted_time
 
