@@ -29,6 +29,6 @@ This class encapsulates the functionality related to predicting delivery times a
   - `generate_road_map`: Generates a road map visualization showing the delivery route and predicted delivery time.
 
 ## Model Performance
-Mean Squared Error: 0.000005100253098677894
-Mean Absolute Error: 0.001038831013819455
+Mean Squared Error: 0.000005100253098677894 <br>
+Mean Absolute Error: 0.001038831013819455 <br>
 r^2 Score: 0.9999999706945272
