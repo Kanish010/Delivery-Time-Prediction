@@ -54,7 +54,7 @@ class DataCreation:
                 # Calculate distance between restaurant and delivery point
                 delivery_point = (random_point.y, random_point.x)
                 distance = self.calculate_distance((restaurant_latitude, restaurant_longitude), delivery_point)
-                time_taken = distance / 50 * 60  # speed in km/h, convert to minutes
+                time_taken = distance / 50 * 60  # assuming avg speed 50kmh
                 
                 random_points.append({'Delivery_ID': delivery_id, 
                                       'DeliveryLongitude': random_point.x, 
