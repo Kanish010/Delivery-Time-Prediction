@@ -37,6 +37,15 @@ class DeliveryTimePredictor:
         print("Mean Absolute Error:", mae)
         print("r^2 Score:", r2)
 
+    def geocode_address(self, address):
+        geocode_result = self.gmaps.geocode(address)
+        if geocode_result:
+            location = (geocode_result[0]['geometry']['location']['lat'], geocode_result[0]['geometry']['location']['lng'])
+            return location
+        else:
+            print("Error: Unable to geocode address.")
+            return None
+
     def predict_delivery_time(self, delivery_location, restaurant_location):
         distance = geodesic(delivery_location, restaurant_location).kilometers
         features = [[*delivery_location, *restaurant_location, distance]]
@@ -64,35 +73,21 @@ def main():
     API_KEY = 'YOUR_API_KEY'
     file_path = 'TrainingData.csv'
 
-    # Initialize Google Maps Geocoding API client
-    gmaps = googlemaps.Client(key=API_KEY)
-
-    # Prompt the user to enter the delivery location address
-    delivery_address = input("Enter the delivery location address: ")
-
-    # Prompt the user to enter the restaurant location address
-    restaurant_address = input("Enter the restaurant location address: ")
-
-    # Geocode the delivery location address
-    delivery_geocode = gmaps.geocode(delivery_address)
-    if delivery_geocode:
-        delivery_location = (delivery_geocode[0]['geometry']['location']['lat'], delivery_geocode[0]['geometry']['location']['lng'])
-    else:
-        print("Error: Unable to geocode delivery location address.")
-        return
-
-    # Geocode the restaurant location address
-    restaurant_geocode = gmaps.geocode(restaurant_address)
-    if restaurant_geocode:
-        restaurant_location = (restaurant_geocode[0]['geometry']['location']['lat'], restaurant_geocode[0]['geometry']['location']['lng'])
-    else:
-        print("Error: Unable to geocode restaurant location address.")
-        return
-
-    # Initialize the DeliveryTimePredictor instance
     predictor = DeliveryTimePredictor(API_KEY, file_path)
     predictor.load_training_data()
     predictor.train_model()
+
+    # Prompt the user to enter the delivery location address
+    delivery_address = input("Enter the delivery street address: ")
+    delivery_location = predictor.geocode_address(delivery_address)
+    if not delivery_location:
+        return
+
+    # Prompt the user to enter the restaurant location address
+    restaurant_address = input("Enter the restaurant street address: ")
+    restaurant_location = predictor.geocode_address(restaurant_address)
+    if not restaurant_location:
+        return
 
     # Calculate the distance between delivery and restaurant locations
     distance = geodesic(delivery_location, restaurant_location).kilometers
