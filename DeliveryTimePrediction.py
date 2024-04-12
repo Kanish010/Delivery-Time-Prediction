@@ -37,6 +37,15 @@ class DeliveryTimePredictor:
         print("Mean Absolute Error:", mae)
         print("r^2 Score:", r2)
 
+    def geocode_address(self, address):
+        geocode_result = self.gmaps.geocode(address)
+        if geocode_result:
+            location = (geocode_result[0]['geometry']['location']['lat'], geocode_result[0]['geometry']['location']['lng'])
+            return location
+        else:
+            print("Error: Unable to geocode address.")
+            return None
+
     def predict_delivery_time(self, delivery_location, restaurant_location):
         distance = geodesic(delivery_location, restaurant_location).kilometers
         features = [[*delivery_location, *restaurant_location, distance]]
@@ -61,23 +70,32 @@ class DeliveryTimePredictor:
         m.save("Delivery_Route.html")
 
 def main():
-    API_KEY = 'YOUR_API_KEY'
+    API_KEY = 'AIzaSyA6sRQ4jKW0BoiFujR6cQy3ZX8-PDulLl8'
     file_path = 'TrainingData.csv'
-    delivery_location = (1.3196, 103.7525)
-    restaurant_location = (1.2964, 103.7925)
-
-    #Other example locations, simply comment the above an uncomment which ones you want to use
-    #delivery_location = (1.2668, 103.8107) 
-    #restaurant_location = (1.3644, 103.9915)
-    #delivery_location = (1.3471, 103.7654)
-    #restaurant_location = (1.3039, 103.8319)
 
     predictor = DeliveryTimePredictor(API_KEY, file_path)
     predictor.load_training_data()
     predictor.train_model()
 
+    # Prompt the user to enter the delivery location address
+    delivery_address = input("Enter the delivery street address: ")
+    delivery_location = predictor.geocode_address(delivery_address)
+    if not delivery_location:
+        return
+
+    # Prompt the user to enter the restaurant location address
+    restaurant_address = input("Enter the restaurant street address: ")
+    restaurant_location = predictor.geocode_address(restaurant_address)
+    if not restaurant_location:
+        return
+
+    # Calculate the distance between delivery and restaurant locations
     distance = geodesic(delivery_location, restaurant_location).kilometers
+
+    # Predict the delivery time
     predicted_time = predictor.predict_delivery_time(delivery_location, restaurant_location)
+
+    # Generate the road map
     predictor.generate_road_map(restaurant_location, delivery_location, predicted_time, distance)
 
 if __name__ == "__main__":
