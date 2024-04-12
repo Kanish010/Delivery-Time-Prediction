@@ -61,17 +61,15 @@ class DeliveryTimePredictor:
         folium.Marker(restaurant_location, popup="Restaurant").add_to(m)
         delivery_marker = folium.Marker(delivery_location).add_to(m)
 
-        popup_text = "Predicted Delivery Time: {:.2f} minutes\n Distance: {:.2f} km".format(predicted_time, distance)
+        popup_text = "Estimated Delivery Time: {:.2f} minutes\n Distance: {:.2f} km".format(predicted_time, distance)
         folium.Popup(popup_text).add_to(delivery_marker)
 
         directions = self.gmaps.directions(restaurant_location, delivery_location, mode="driving")
         polyline_points = directions[0]['overview_polyline']['points']
         decoded_points = polyline.decode(polyline_points)
         folium.PolyLine(locations=decoded_points, color='blue', weight=5, opacity=0.7, popup="Delivery Route").add_to(m)
-
-        file_name = "Delivery_RouteNew.html"
-        m.save(file_name)
-        return file_name
+        
+        m.save("Delivery_Route.html")
 
 def get_user_input(prompt):
     root = tk.Tk()
@@ -80,7 +78,7 @@ def get_user_input(prompt):
     return user_input
 
 def main():
-    API_KEY = 'AIzaSyA6sRQ4jKW0BoiFujR6cQy3ZX8-PDulLl8'
+    API_KEY = 'YOUR_API_KEY'
     file_path = 'TrainingData.csv'
 
     predictor = DeliveryTimePredictor(API_KEY, file_path)
