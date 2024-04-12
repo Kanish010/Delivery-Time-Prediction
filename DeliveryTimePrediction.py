@@ -70,7 +70,7 @@ class DeliveryTimePredictor:
         m.save("Delivery_Route.html")
 
 def main():
-    API_KEY = 'AIzaSyA6sRQ4jKW0BoiFujR6cQy3ZX8-PDulLl8'
+    API_KEY = 'YOUR_API_KEY'
     file_path = 'TrainingData.csv'
 
     predictor = DeliveryTimePredictor(API_KEY, file_path)
