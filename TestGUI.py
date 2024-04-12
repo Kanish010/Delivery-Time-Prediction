@@ -50,7 +50,7 @@ class DeliveryTimePredictor:
 
     def predict_delivery_time(self, delivery_location, restaurant_location):
         distance = geodesic(delivery_location, restaurant_location).kilometers
-        features = [[*delivery_location, *restaurant_location, distance]]
+        features = pd.DataFrame([[*delivery_location, *restaurant_location, distance]], columns=['DeliveryLatitude', 'DeliveryLongitude', 'RestaurantLatitude', 'RestaurantLongitude', 'Distance (Km)'])
         predicted_time = self.model.predict(features)[0]
         return predicted_time
 
