@@ -1,11 +1,15 @@
+import os
 import pandas as pd
 import folium
 import googlemaps
 import polyline
 from geopy.distance import geodesic
+from dotenv import load_dotenv
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+
+load_dotenv()  # Load environment variables from .env file
 
 class DeliveryTimePredictor:
     def __init__(self, api_key, file_path):
@@ -28,14 +32,22 @@ class DeliveryTimePredictor:
         self.model = RandomForestRegressor(n_estimators=100, random_state=42)
         self.model.fit(X_train, y_train)
 
-        y_pred = self.model.predict(X_test)
-        mse = mean_squared_error(y_test, y_pred)
-        mae = mean_absolute_error(y_test, y_pred)
-        r2 = r2_score(y_test, y_pred)
+        # Predictions and r^2 for test set
+        y_test_pred = self.model.predict(X_test)
+        test_r2 = r2_score(y_test, y_test_pred)
+        print("Test r^2 Score:", test_r2)
 
-        print("Mean Squared Error:", mse)
-        print("Mean Absolute Error:", mae)
-        print("r^2 Score:", r2)
+        # Predictions and r^2 for train set
+        y_train_pred = self.model.predict(X_train)
+        train_r2 = r2_score(y_train, y_train_pred)
+        print("Train r^2 Score:", train_r2)
+
+        # Additional metrics for the test set
+        mse = mean_squared_error(y_test, y_test_pred)
+        mae = mean_absolute_error(y_test, y_test_pred)
+        
+        print("Mean Squared Error (Test):", mse)
+        print("Mean Absolute Error (Test):", mae)
 
     def geocode_address(self, address):
         geocode_result = self.gmaps.geocode(address)
@@ -70,7 +82,7 @@ class DeliveryTimePredictor:
         m.save("Delivery_Route.html")
 
 def main():
-    API_KEY = 'YOUR_API_KEY'
+    API_KEY = os.getenv('API_KEY')
     file_path = 'TrainingData.csv'
 
     predictor = DeliveryTimePredictor(API_KEY, file_path)
